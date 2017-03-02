@@ -38,10 +38,10 @@ require('./config/express')(app);
 // Create the service wrapper
 // If no API Key is provided here, the watson-developer-cloud@2.x.x library will check for an VISUAL_RECOGNITION_API_KEY 
 // environment property and then fall back to the VCAP_SERVICES property provided by Bluemix.
-var visualRecognition = new watson.VisualRecognitionV3({
-  // api_key: '<api-key>',
-  version_date: '2015-05-19'
-});
+//var visualRecognition = new watson.VisualRecognitionV3({
+//  // api_key: '<api-key>',
+//  version_date: '2015-05-19'
+//});
 
 app.get('/', function(req, res) {
   res.render('use');
@@ -318,7 +318,7 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
 
 
  var post_options = {
-      host: 'localhost',
+      host: process.env.WATSON_BACKEND_IP,
       port: '8000',
       path: '/vrdemo',
       method: 'POST',
