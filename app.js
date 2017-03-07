@@ -246,17 +246,22 @@ app.get ('/audiofile/:sessionid', function (req, res) {
   let path = '/tmp/audiofile-' + req.params.sessionid + '.wav';
   console.log ("Sending file at path:  " + path);
   
-  sendAudioFile (path, req, res);
+  sendAudioFile (path, 1, req, res);
 });
 
-function sendAudioFile (path, req, res) {
+function sendAudioFile (path, count, req, res) {
 
   fs.access (path, fs.constants.R_OK, function (error) {
 
     if (error) {
 
-      console.log ("File not ready yet; rescheudling:  " + path);
-      setTimeout (sendAudioFile, 1000, path, req, res);
+      if (count < 3600) {
+        console.log ("File not ready yet; rescheudling:  " + path);
+        count++;
+        setTimeout (sendAudioFile, 1000, path, count, req, res);
+      } else {
+        console.log ("File was never ready; giving up:  " + path);
+      }
     } else {
 
       setTimeout (fs.unlinkSync, 3600000, path);
