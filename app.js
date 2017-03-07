@@ -26,7 +26,6 @@ var watson = require('watson-developer-cloud');
 var uuid = require('uuid');
 var bundleUtils = require('./config/bundle-utils');
 var os = require('os');
-//var request = require('request');
 var http = require ('http');
 
 var ONE_HOUR = 3600000;
@@ -278,111 +277,84 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
 
 
 
-    console.log ("Checkpoint 1");
 
 
 
 
+    var playaudio = false;
+    if (process.env.PLAYAUDIO && process.env.PLAYAUDIO.toLowerCase () === 'true') playaudio = true;
 
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-
-    request.get ('http://localhost:8000/test', function () {
-      console.log ("Checkpoint 1.5");
-    });
-    request.post({url:'http://localhost:8000/vrdemo', formData: req.body.image_data}, function optionalCallback(err, httpResponse, body) {
-      console.log ("Checkpoint 2");
-      if (err) {
-        console.log ('upload failed:', err);
-      }
-      console.log ("Checkpoint 3");
-      console.log('Upload successful!  Server responded with:', body);
-    });
-  
-
-*/
-
-
-
-
-
- var post_options = {
+    var post_options = {
       host: process.env.WATSON_BACKEND_IP,
       port: '8000',
       path: '/vrdemo',
       method: 'POST',
       headers: {}
-  };
-    console.log ("Checkpoint 2");
+    };
 
-// Set up the request
-var audioOutputBase64 = "";
-  var post_req = http.request(post_options, function(resp) {
-    console.log ("Checkpoint 3");
+    // Set up the request
+    var watsonOutput = "";
+    var post_req = http.request (post_options, function (resp) {
+
+      console.log ("Checkpoint 3");
       resp.setEncoding('utf8');
-    console.log ("Checkpoint 4");
-      resp.on('data', function (chunk) {
-    console.log ("Checkpoint 5");
-          audioOutputBase64 += chunk;
+
+      console.log ("Checkpoint 4");
+      resp.on ('data', function (chunk) {
+
+        console.log ("Checkpoint 5");
+        watsonOutput += chunk;
       });
+
       resp.on ('end', function () {
-        var b = new Buffer(audioOutputBase64, 'base64')
-        fs.writeFile ('/tmp/audiofile.wav', b, function (error) {
+
+        watsonOutput = JSON.parse (watsonOutput);
+        var classes = watsonOutput.classes;
+        var audio   = watsonOutput.audioBase64;
+        audio       = new Buffer (audio, 'base64');
+
+        fs.writeFile ('/tmp/audiofile.wav', audio, function (error) {
+
           if (error) {
+
             console.log ("Error writing audio file:  " + error);
-            process.exit (1);
 
           } else {
-
-//            res.redirect ('/playaudio');
-//            res.end ();
-
-            res.end("<javascript>window.top.location.href = \"http://site.com\";</javascript>");
-
+            
+//            res.end("<javascript>window.top.location.href = \"http://site.com\";</javascript>");
+              console.log ("Sending:  " + JSON.stringify (classes, null, "    "));
+//              if (playaudio) {
+//                res.send ("<div><center><audio controls autoplay><source src=\"/audiofile\" type=\"audio/wav\">Your browser does not support the audio element.</audio></center></div>");
+//              }
+              res.json (classes);
           }
         });
       });
-  });
+    });
+
     console.log ("Checkpoint 6");
 
-  // post the data
-  //console.log ("sending image data:  " + req.body.image_data);
-  post_req.write(req.body.image_data);
+    post_req.write(req.body.image_data);
     console.log ("Checkpoint 7");
-  post_req.end();
 
+    post_req.end();
     console.log ("Checkpoint 8");
-
-
-
-
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
