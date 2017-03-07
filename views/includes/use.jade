@@ -14,6 +14,9 @@ div._demo--container
     img.use--error-image.error--image(src='images/icons/alert.svg')
     p.base--p.use--error-message.error--message Visual Recognition is not available right now...
   .use--output.display-none
+    if playaudio == true
+      h2.base--h2.use--output-header Watson says...
+      <div><center><audio controls><source src="/audiofile/#{sessionid}" type="audio/wav">Your browser does not support the audio element.</audio></center></div>
     h2.base--h2.use--output-header Watson sees...
     .use--output-row
       .use--output-image-container

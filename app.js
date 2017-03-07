@@ -31,6 +31,10 @@ var http = require ('http');
 var ONE_HOUR = 3600000;
 var TWENTY_SECONDS = 20000;
 
+var playaudio = false;
+if (process.env.PLAYAUDIO == 'true') playaudio = true;
+var sessionid = 12345;
+
 // Bootstrap application settings
 require('./config/express')(app);
 
@@ -43,7 +47,8 @@ require('./config/express')(app);
 //});
 
 app.get('/', function(req, res) {
-  res.render('use');
+  sessionid = Math.floor (Math.random () * 10000);
+  res.render('use', {playaudio: playaudio, sessionid: sessionid});
 });
 
 var scoreData = function(score) {
@@ -236,17 +241,36 @@ function parseBase64Image(imageString) {
 
 
 
-app.get ('/audiofile', function (req, res) {
+app.get ('/audiofile/:sessionid', function (req, res) {
 
-  res.sendFile ('/tmp/audiofile.wav');
-
+  let path = '/tmp/audiofile-' + req.params.sessionid + '.wav';
+  console.log ("Sending file at path:  " + path);
+  
+  sendAudioFile (path, req, res);
 });
 
+function sendAudioFile (path, req, res) {
+
+  fs.access (path, fs.constants.R_OK, function (error) {
+
+    if (error) {
+
+      console.log ("File not ready yet; rescheudling:  " + path);
+      setTimeout (sendAudioFile, 1000, path, req, res);
+    } else {
+
+      setTimeout (fs.unlinkSync, 3600000, path);
+//      setTimeout (fs.unlinkSync, 60000, path);
+      res.sendFile (path);
+    }
+  });
+}
 
 
-app.get('/playaudio', function(req, res) {
-  res.render('playaudio');
-});
+
+
+
+
 
 
 
@@ -281,8 +305,6 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
 
 
 
-    var playaudio = false;
-    if (process.env.PLAYAUDIO && process.env.PLAYAUDIO.toLowerCase () === 'true') playaudio = true;
 
     var post_options = {
       host: process.env.WATSON_BACKEND_IP,
@@ -296,24 +318,26 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
     var watsonOutput = "";
     var post_req = http.request (post_options, function (resp) {
 
-      console.log ("Checkpoint 3");
+      console.log ("Received photo request");
       resp.setEncoding('utf8');
 
-      console.log ("Checkpoint 4");
       resp.on ('data', function (chunk) {
 
-        console.log ("Checkpoint 5");
         watsonOutput += chunk;
       });
 
       resp.on ('end', function () {
 
+        console.log ('Finished receiving output from intermediary');
+//        console.log ('Output:\n' + watsonOutput);
+
         watsonOutput = JSON.parse (watsonOutput);
         var classes = watsonOutput.classes;
         var audio   = watsonOutput.audioBase64;
+//console.log ("Audio:  " + audio);
         audio       = new Buffer (audio, 'base64');
 
-        fs.writeFile ('/tmp/audiofile.wav', audio, function (error) {
+        fs.writeFile ('/tmp/audiofile-' + sessionid + '.wav', audio, function (error) {
 
           if (error) {
 
@@ -332,13 +356,12 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
       });
     });
 
-    console.log ("Checkpoint 6");
-
+    console.log ("Writing image data to intermediary");
     post_req.write(req.body.image_data);
-    console.log ("Checkpoint 7");
+    console.log ("Finished writing image data to intermediary");
 
     post_req.end();
-    console.log ("Checkpoint 8");
+    console.log ("Ended request to intermediary");
   }
 
 
