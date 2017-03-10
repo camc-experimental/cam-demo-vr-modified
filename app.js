@@ -267,9 +267,17 @@ function sendAudioFile (path, count, req, res) {
       }
     } else {
 
-      setTimeout (fs.unlinkSync, 3600000, path);
-//      setTimeout (fs.unlinkSync, 60000, path);
       res.sendFile (path);
+
+      setTimeout (function (mp4File) {
+
+        console.log ("Deleting file:  " + mp4File);
+        fs.unlink (mp4File, function (error) {
+
+          console.log ("Error:  Unable to delete file:  " + mp4File);
+        });
+
+      }, 3600000, path);
     }
   });
 }
@@ -359,6 +367,16 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
 //                res.send ("<div><center><audio controls autoplay><source src=\"/audiofile\" type=\"audio/wav\">Your browser does not support the audio element.</audio></center></div>");
 //              }
               res.json (classes);
+
+              setTimeout (function (mp4File) {
+
+                console.log ("Deleting file:  " + mp4File);
+                fs.unlink (mp4File, function (error) {
+
+                  console.log ("Error:  Unable to delete file:  " + mp4File);
+                });
+
+              }, 86400000, audioDir + '/audiofile-' + sessionid + '.mp4');
           }
         });
       });
