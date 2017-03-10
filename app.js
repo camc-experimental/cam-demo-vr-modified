@@ -49,7 +49,7 @@ require('./config/express')(app);
 app.get('/', function(req, res) {
   sessionid = Math.floor (Math.random () * 10000);
   var audiohack = fs.readFileSync ('/tmp/audiohack.ogg');
-  fs.writeFileSync ('/tmp/audiofile-' + sessionid + '.ogg', audiohack);
+  fs.writeFileSync ('/tmp/audiofile-' + sessionid + '.mp4', audiohack);
   res.render('use', {playaudio: playaudio, sessionid: sessionid});
 });
 
@@ -245,7 +245,7 @@ function parseBase64Image(imageString) {
 
 app.get ('/audiofile/:sessionid/:dummy', function (req, res) {
 
-  let path = '/tmp/audiofile-' + req.params.sessionid + '.ogg';
+  let path = '/tmp/audiofile-' + req.params.sessionid + '.mp4';
   console.log ("Sending file at path:  " + path);
   
   sendAudioFile (path, 1, req, res);
@@ -344,7 +344,7 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res) {
 //console.log ("Audio:  " + audio);
         audio       = new Buffer (audio, 'base64');
 
-        fs.writeFile ('/tmp/audiofile-' + sessionid + '.ogg', audio, function (error) {
+        fs.writeFile ('/tmp/audiofile-' + sessionid + '.mp4', audio, function (error) {
 
           if (error) {
 
