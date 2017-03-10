@@ -9,3 +9,6 @@ uploads/*
 .jshintignore
 .jshintrc
 delete-all.js
+.mp4
+.ogg
+
