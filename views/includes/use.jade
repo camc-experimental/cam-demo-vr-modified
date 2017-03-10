@@ -16,7 +16,7 @@ div._demo--container
   .use--output.display-none
     if playaudio == true
       h2.base--h2.use--output-header Watson says...
-      <div><center><audio controls><source src="/audiofile/#{sessionid}" type="audio/wav">Your browser does not support the audio element.</audio></center></div>
+      <div><center><audio controls id="player"><source id="audio" src="/audiofile/#{sessionid}/1" preload="none" type="audio/wav">Your browser does not support the audio element.</audio></center></div>
       //<div><button onclick="getAudio()">Update Audio</button></div>
     h2.base--h2.use--output-header Watson sees...
     .use--output-row

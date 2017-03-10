@@ -241,7 +241,7 @@ function parseBase64Image(imageString) {
 
 
 
-app.get ('/audiofile/:sessionid', function (req, res) {
+app.get ('/audiofile/:sessionid/:dummy', function (req, res) {
 
   let path = '/tmp/audiofile-' + req.params.sessionid + '.wav';
   console.log ("Sending file at path:  " + path);
