@@ -28,6 +28,12 @@ var bundleUtils = require('./config/bundle-utils');
 var os = require('os');
 var http = require ('http');
 
+if (typeof (process.env.AEM_PATH) !== 'undefined' && process.env.AEM_PATH !== "" && process.env.AEM_PATH !== null) {
+  require (process.env.AEM_PATH + 'knj_index');
+  require (process.env.AEM_PATH + 'knj_deepdive.js');
+  require (process.env.AEM_PATH + 'knj_methodtrace.js');
+}
+
 var ONE_HOUR = 3600000;
 var TWENTY_SECONDS = 20000;
 
