@@ -114,11 +114,15 @@ function setupUse(params) {
     $error.hide();
 
     var player=document.getElementById('player');
-    var source = document.getElementById('audio');
-    source.src = source.src + "1";
-//    alert(source.src);
-    player.load(); //call this to just preload the audio without playing
-    player.play();
+
+    if (player) {
+      var source = document.getElementById('audio');
+
+      source.src = source.src + "1";
+      //    alert(source.src);
+      player.load(); //call this to just preload the audio without playing
+      player.play();
+    }
 
     if (!results || !results.images || !results.images[0]) {
       showError(errorMessages.ERROR_PROCESSING_REQUEST);
