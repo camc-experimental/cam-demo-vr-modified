@@ -9,6 +9,7 @@ mixin sampleInput(className, bundle, classifierId)
     - bundleImages.push('images/bundles/' + bundle + '/test/' + val + '.jpg')
 
   form(id='#{className}--fileupload', class='#{className}--form #{className}--dropzone hideload', data-upload-template-id='template-upload-#{className}')
+    <input type="hidden" name="session" value='#{sessionid || ""}'>
     input(id='classifier_id', type='hidden', name='classifier_id', value='#{classifierId || ""}')
     if className == 'use'
       div(class='#{className}--example-images #{className}--example-images_default')
@@ -34,5 +35,5 @@ mixin sampleInput(className, bundle, classifierId)
     var sessionID=#{sessionid};
     function getAudio() {
       //alert("did it work");
-      document.getElementByID("watson-audio-player").src = "/audiofile/"+sessionID; 
+      document.getElementByID("watson-audio-player").src = "/audiofile/"+sessionID;
       return false; }
